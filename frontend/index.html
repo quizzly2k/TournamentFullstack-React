@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="login-section" class="section-container">
+        <div class="login-form">
+            <h1>Tournament Manager</h1>
+            <p>Logga in för att komma igång</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Användarnamn:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Lösenord:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Logga in</button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application Section -->
+    <div id="app-section" class="section-container hidden">
+        <header class="header">
+            <div class="header-content">
+                <h1>Tournament Manager</h1>
+                <div class="user-info">
+                    <span id="current-user"></span>
+                    <button id="logout-btn" class="btn btn-secondary">Logga ut</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tournaments">Turneringar</button>
+                <button class="tab-btn" data-tab="games">Spel</button>
+            </div>
+
+            <!-- Tournaments Tab -->
+            <section id="tournaments-tab" class="tab-content active">
+                <h2>Turneringar</h2>
+                
+                <form id="tournament-form" class="tournament-form">
+                    <h3>Lägg till ny turnering</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tournament-title">Namn:</label>
+                            <input type="text" id="tournament-title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tournament-description">Beskrivning:</label>
+                            <input type="text" id="tournament-description" name="description">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tournament-maxplayers">Max spelare:</label>
+                            <input type="number" id="tournament-maxplayers" name="maxPlayers" min="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tournament-date">Datum:</label>
+                            <input type="datetime-local" id="tournament-date" name="date" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Lägg till turnering</button>
+                    <p id="tournament-form-error" class="error-message"></p>
+                </form>
+
+                <div id="tournaments-list" class="tournaments-list">
+                    <p class="loading">Laddar turneringar...</p>
+                </div>
+            </section>
+
+            <!-- Games Tab -->
+            <section id="games-tab" class="tab-content hidden">
+                <h2>Spel</h2>
+                
+                <div class="games-container">
+                    <div id="select-tournament" class="tournament-selector">
+                        <label for="game-tournament-select">Välj turnering:</label>
+                        <select id="game-tournament-select">
+                            <option value="">-- Välj turnering --</option>
+                        </select>
+                    </div>
+
+                    <form id="game-form" class="game-form hidden">
+                        <h3>Lägg till nytt spel</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="game-title">Spel namn:</label>
+                                <input type="text" id="game-title" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="game-time">Tid:</label>
+                                <input type="datetime-local" id="game-time" name="time" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lägg till spel</button>
+                        <p id="game-form-error" class="error-message"></p>
+                    </form>
+
+                    <div id="games-list" class="games-list">
+                        <p class="loading">Välj en turnering för att se spel</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tournaments.js"></script>
+    <script src="js/games.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
