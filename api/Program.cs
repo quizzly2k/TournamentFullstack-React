@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 
 // Add DbContext with SQL Server connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Server=localhost;Database=TournamentDb;User Id=sa;Password=YourPassword123!;Encrypt=false;TrustServerCertificate=true;";
+    ?? "Server=localhost;Database=TournamentDb;User Id=tournamentadmin;Password=datareader;Encrypt=false;TrustServerCertificate=true;";
 
 builder.Services.AddDbContext<TournamentContext>(options =>
     options.UseSqlServer(connectionString));
