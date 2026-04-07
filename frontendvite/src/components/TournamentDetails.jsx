@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { apiClient } from '../api/apiClient';
 import { GamesList } from './GamesList';
 import { GameForm } from './GameForm';
@@ -77,7 +78,13 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
     }
 
     return (
-        <div className="tournament-details-view">
+        <motion.div
+            className="tournament-details-view"
+            initial={{ x: -500, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 500, opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
             <div className="tournament-header">
                 <div className="tournament-info">
                     <h2>{tournament.title}</h2>
@@ -144,6 +151,6 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
                     onDelete={handleDeleteGame}
                 />
             </section>
-        </div>
+        </motion.div>
     );
 }

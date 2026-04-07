@@ -28,6 +28,33 @@ body {
     min-height: 100vh;
 }
 
+/* Scrollbar Styling - Medieval Theme */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+    border-left: 1px solid var(--secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #8B4513, #D4A574);
+    border-radius: 6px;
+    border: 2px solid #654321;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #A0522D, #E6B87E);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox Scrollbar */
+* {
+    scrollbar-color: linear-gradient(to bottom, #8B4513, #D4A574) linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+    scrollbar-width: thin;
+}
+
 /* Stone texture overlay */
 body::before {
     content: '';
@@ -267,16 +294,21 @@ body::before {
 }
 
 .tournaments-sidebar {
+    position: fixed;
+    left: 0;
+    top: 80px;
     width: 300px;
+    height: calc(100vh - 80px);
     background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
     border-right: 2px solid var(--secondary-color);
     overflow-y: auto;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    order: -1;
+    z-index: 50;
 }
 
 .tournament-details {
+    margin-left: 300px;
     flex: 1;
     overflow-y: auto;
     padding: 0;
@@ -530,6 +562,44 @@ body::before {
     padding: 15px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     border-bottom: 3px solid var(--secondary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Medieval pattern background for header */
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(212, 165, 116, 0.03) 20px,
+            rgba(212, 165, 116, 0.03) 40px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 20px,
+            rgba(212, 165, 116, 0.03) 20px,
+            rgba(212, 165, 116, 0.03) 40px
+        ),
+        radial-gradient(
+            circle at 20% 30%,
+            rgba(212, 165, 116, 0.05) 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(212, 165, 116, 0.05) 0%,
+            transparent 50%
+        );
+    pointer-events: none;
 }
 
 .header-content {
@@ -540,6 +610,8 @@ body::before {
     justify-content: space-between;
     align-items: center;
     height: 50px;
+    position: relative;
+    z-index: 1;
 }
 
 .header h1 {
@@ -643,6 +715,18 @@ body::before {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .tournaments-sidebar {
+        position: fixed;
+        left: 0;
+        top: 80px;
+        width: 250px;
+        z-index: 40;
+    }
+
+    .tournament-details {
+        margin-left: 250px;
+    }
+
     .header-content {
         flex-direction: column;
         gap: 15px;
@@ -673,5 +757,23 @@ body::before {
 
     .card-actions .btn {
         flex: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .tournaments-sidebar {
+        width: 200px;
+    }
+
+    .tournament-details {
+        margin-left: 200px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .user-info {
+        gap: 10px;
     }
 }

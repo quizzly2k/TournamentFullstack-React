@@ -38,7 +38,7 @@ export function MainApp() {
     };
 
     return (
-        <div className="section-container">
+        <>
             <Header />
             <div className="app-layout">
                 <TournamentsSidebar
@@ -62,6 +62,6 @@ export function MainApp() {
                     )}
                 </main>
             </div>
-        </div>
+        </>
     );
 }

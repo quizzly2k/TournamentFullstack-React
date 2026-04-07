@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export function GamesList({ games, loading, onEdit, onDelete }) {
     if (loading) {
@@ -10,9 +11,31 @@ export function GamesList({ games, loading, onEdit, onDelete }) {
     }
 
     return (
-        <div className="games-list-details">
+        <motion.div
+            className="games-list-details"
+            initial="hidden"
+            animate="visible"
+            variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                    opacity: 1,
+                    transition: {
+                        staggerChildren: 0.1,
+                        delayChildren: 0.2,
+                    },
+                },
+            }}
+        >
             {games.map(game => (
-                <div key={game.id} className="game-card">
+                <motion.div
+                    key={game.id}
+                    className="game-card"
+                    variants={{
+                        hidden: { y: 20, opacity: 0 },
+                        visible: { y: 0, opacity: 1 },
+                    }}
+                    transition={{ duration: 0.4 }}
+                >
                     <h3>{game.title}</h3>
                     <div className="card-info">
                         <div>
@@ -27,8 +50,8 @@ export function GamesList({ games, loading, onEdit, onDelete }) {
                             Ta bort
                         </button>
                     </div>
-                </div>
+                </motion.div>
             ))}
-        </div>
+        </motion.div>
     );
 }
