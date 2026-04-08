@@ -28,11 +28,11 @@ export function AuthProvider({ children }) {
             }
 
             const response = await apiClient.post('/auth/register', {
-                username,
-                email,
-                password,
-                firstName: firstName || '',
-                lastName: lastName || ''
+                Username: username,
+                Email: email,
+                Password: password,
+                FirstName: firstName || '',
+                LastName: lastName || ''
             });
 
             if (!response.success) {
@@ -53,8 +53,8 @@ export function AuthProvider({ children }) {
             }
 
             const response = await apiClient.post('/auth/login', {
-                username,
-                password
+                Username: username,
+                Password: password
             });
 
             if (!response.success) {

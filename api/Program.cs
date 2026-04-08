@@ -10,7 +10,11 @@ using TournamentAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // Add DbContext with SQL Server connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
@@ -19,8 +23,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<TournamentContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Add Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+// Add Identity with relaxed password policy for development
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 3;
+})
     .AddEntityFrameworkStores<TournamentContext>()
     .AddDefaultTokenProviders();
 

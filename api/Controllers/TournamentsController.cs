@@ -44,13 +44,7 @@ public class TournamentsController : ControllerBase
         {
             var tournaments = await _tournamentService.GetAllAsync(search);
 
-            // If user is not Admin, only return their own tournaments
-            if (!IsAdmin())
-            {
-                var userId = GetUserId();
-                tournaments = tournaments.Where(t => t.UserId == userId);
-            }
-
+            // All authenticated users can see all tournaments
             return Ok(tournaments);
         }
         catch (ArgumentException ex)
@@ -79,6 +73,7 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<TournamentResponseDTO>> CreateTournament(
         [FromBody] TournamentCreateDTO createDTO)
     {

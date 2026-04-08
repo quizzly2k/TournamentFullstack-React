@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 import { apiClient } from '../api/apiClient';
 import { TournamentForm } from './TournamentForm';
 import { TournamentsList } from './TournamentsList';
 
 export function TournamentsSidebar({ selectedId, onSelectTournament, onTournamentChanged }) {
+    const { isAdmin } = useContext(AuthContext);
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -51,12 +53,14 @@ export function TournamentsSidebar({ selectedId, onSelectTournament, onTournamen
         <aside className="tournaments-sidebar">
             <div className="sidebar-header">
                 <h2>Turneringar</h2>
-                <button
-                    className="btn btn-primary btn-small"
-                    onClick={() => setShowForm(!showForm)}
-                >
-                    + Ny
-                </button>
+                {isAdmin() && (
+                    <button
+                        className="btn btn-primary btn-small"
+                        onClick={() => setShowForm(!showForm)}
+                    >
+                        + Ny
+                    </button>
+                )}
             </div>
 
             {showForm && (

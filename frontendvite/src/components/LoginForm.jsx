@@ -50,6 +50,13 @@ export function LoginForm() {
         }
     };
 
+    const handleInputChange = () => {
+        // Rensa endast "lyckats"-meddelanden, behål felmeddelanden
+        if (error && error.includes('lyckades')) {
+            setError('');
+        }
+    };
+
     return (
         <div className="section-container">
             <div className="login-form">
@@ -62,7 +69,10 @@ export function LoginForm() {
                             type="text"
                             id="username"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => {
+                                setUsername(e.target.value);
+                                handleInputChange();
+                            }}
                             required
                         />
                     </div>
@@ -75,7 +85,10 @@ export function LoginForm() {
                                     type="email"
                                     id="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        handleInputChange();
+                                    }}
                                     required
                                 />
                             </div>
@@ -87,7 +100,10 @@ export function LoginForm() {
                                         type="text"
                                         id="firstName"
                                         value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
+                                        onChange={(e) => {
+                                            setFirstName(e.target.value);
+                                            handleInputChange();
+                                        }}
                                     />
                                 </div>
                                 <div className="form-group">
@@ -96,7 +112,10 @@ export function LoginForm() {
                                         type="text"
                                         id="lastName"
                                         value={lastName}
-                                        onChange={(e) => setLastName(e.target.value)}
+                                        onChange={(e) => {
+                                            setLastName(e.target.value);
+                                            handleInputChange();
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -104,12 +123,22 @@ export function LoginForm() {
                     )}
 
                     <div className="form-group">
-                        <label htmlFor="password">Lösenord:</label>
+                        <label htmlFor="password">
+                            Lösenord:
+                            {isRegistering && (
+                                <span className="tooltip-icon" title="Lösenordskrav: Minst 3 tecken. Inga specialkrav på bokstäver eller siffror.">
+                                    ℹ️
+                                </span>
+                            )}
+                        </label>
                         <input
                             type="password"
                             id="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                handleInputChange();
+                            }}
                             required
                         />
                     </div>
@@ -134,6 +163,11 @@ export function LoginForm() {
                             onClick={() => {
                                 setIsRegistering(!isRegistering);
                                 setError('');
+                                setUsername('');
+                                setEmail('');
+                                setPassword('');
+                                setFirstName('');
+                                setLastName('');
                             }}
                         >
                             {isRegistering ? 'Logga in istället' : 'Registrera här'}

@@ -127,7 +127,7 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
             <section className="games-section">
                 <div className="games-header">
                     <h3>Spel i turneringen</h3>
-                    {isOwner && (
+                    {user && (
                         <button
                             className="btn btn-primary btn-small"
                             onClick={() => {
@@ -140,7 +140,7 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
                     )}
                 </div>
 
-                {showGameForm && isOwner && (
+                {showGameForm && user && (
                     <GameForm
                         tournamentId={tournament.id}
                         editingGame={editingGame}
