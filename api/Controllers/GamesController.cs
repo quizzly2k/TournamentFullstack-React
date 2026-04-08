@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TournamentAPI.DTOs;
 using TournamentAPI.Services;
 
@@ -6,6 +8,7 @@ namespace TournamentAPI.Controllers;
 
 [ApiController]
 [Route("api/tournaments/{tournamentId}/[controller]")]
+[Authorize]
 public class GamesController : ControllerBase
 {
     private readonly IGameService _gameService;
@@ -25,14 +28,30 @@ public class GamesController : ControllerBase
         _logger = logger;
     }
 
+    private int GetUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        return int.TryParse(userIdClaim?.Value, out var userId) ? userId : 0;
+    }
+
+    private bool IsAdmin()
+    {
+        return User.IsInRole("Admin");
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameResponseDTO>>> GetGames(int tournamentId)
     {
-        // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
         {
             return NotFound(new { error = "Tournament not found" });
+        }
+
+        var userId = GetUserId();
+        if (!IsAdmin() && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to access this tournament's games");
         }
 
         var games = await _gameService.GetAllAsync(tournamentId);
@@ -42,11 +61,16 @@ public class GamesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<GameResponseDTO>> GetGame(int tournamentId, int id)
     {
-        // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
         {
             return NotFound(new { error = "Tournament not found" });
+        }
+
+        var userId = GetUserId();
+        if (!IsAdmin() && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to access this tournament's games");
         }
 
         var game = await _gameService.GetByIdAsync(id);
@@ -62,21 +86,24 @@ public class GamesController : ControllerBase
         int tournamentId,
         [FromBody] GameCreateDTO createDTO)
     {
-        // Check rate limit
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         if (!_rateLimitingService.IsRequestAllowed(clientIp))
         {
             return StatusCode(429, new { error = "Too many requests" });
         }
 
-        // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
         {
             return NotFound(new { error = "Tournament not found" });
         }
 
-        // Validate that TournamentId matches the route parameter
+        var userId = GetUserId();
+        if (!IsAdmin() && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to create games in this tournament");
+        }
+
         if (createDTO.TournamentId != tournamentId)
         {
             return BadRequest(new { error = "Tournament ID in body does not match route parameter" });
@@ -89,7 +116,7 @@ public class GamesController : ControllerBase
 
         try
         {
-            var game = await _gameService.CreateAsync(createDTO);
+            var game = await _gameService.CreateAsync(createDTO, userId);
             return CreatedAtAction(nameof(GetGame), new { tournamentId = tournamentId, id = game.Id }, game);
         }
         catch (KeyNotFoundException ex)
@@ -108,11 +135,16 @@ public class GamesController : ControllerBase
         int id,
         [FromBody] GameUpdateDTO updateDTO)
     {
-        // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
         {
             return NotFound(new { error = "Tournament not found" });
+        }
+
+        var userId = GetUserId();
+        if (!IsAdmin() && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to update games in this tournament");
         }
 
         if (!ModelState.IsValid)
@@ -123,13 +155,6 @@ public class GamesController : ControllerBase
         try
         {
             var game = await _gameService.UpdateAsync(id, updateDTO);
-            
-            // Verify the game belongs to this tournament
-            if (game.TournamentId != tournamentId)
-            {
-                return NotFound();
-            }
-            
             return Ok(game);
         }
         catch (KeyNotFoundException)
@@ -145,18 +170,22 @@ public class GamesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteGame(int tournamentId, int id)
     {
-        // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
         {
             return NotFound(new { error = "Tournament not found" });
         }
 
-        // Verify game exists and belongs to this tournament
+        var userId = GetUserId();
         var game = await _gameService.GetByIdAsync(id);
-        if (game == null || game.TournamentId != tournamentId)
+        if (game == null)
         {
             return NotFound();
+        }
+
+        if (!IsAdmin() && game.UserId != userId && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to delete this game");
         }
 
         var success = await _gameService.DeleteAsync(id);

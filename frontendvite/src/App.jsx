@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { AuthContext, AuthProvider } from './contexts/AuthContext';
+import { AuthContext } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContextProvider';
 import { LoginForm } from './components/LoginForm';
 import { MainApp } from './components/MainApp';
 import { ErrorBanner } from './components/ErrorBanner';

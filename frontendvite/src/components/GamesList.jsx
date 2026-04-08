@@ -1,7 +1,8 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
-export function GamesList({ games, loading, onEdit, onDelete }) {
+export function GamesList({ games, loading, onEdit, onDelete, isOwner }) {
     if (loading) {
         return <p className="loading">Laddar spel...</p>;
     }
@@ -42,14 +43,16 @@ export function GamesList({ games, loading, onEdit, onDelete }) {
                             <span>Tid:</span> {new Date(game.time).toLocaleString('sv-SE')}
                         </div>
                     </div>
-                    <div className="card-actions">
-                        <button className="btn btn-primary" onClick={() => onEdit(game)}>
-                            Redigera
-                        </button>
-                        <button className="btn btn-danger" onClick={() => onDelete(game.id)}>
-                            Ta bort
-                        </button>
-                    </div>
+                    {isOwner && (
+                        <div className="card-actions">
+                            <button className="btn btn-primary" onClick={() => onEdit(game)}>
+                                Redigera
+                            </button>
+                            <button className="btn btn-danger" onClick={() => onDelete(game.id)}>
+                                Ta bort
+                            </button>
+                        </div>
+                    )}
                 </motion.div>
             ))}
         </motion.div>

@@ -5,10 +5,12 @@ public class Game
     public int Id { get; set; }
     public required string Title { get; set; }
     public DateTime Time { get; set; }
-    
-    // Foreign key
+
+    // Foreign keys
     public int TournamentId { get; set; }
-    
-    // Navigation property
+    public int UserId { get; set; }
+
+    // Navigation properties
     public required Tournament Tournament { get; set; }
+    public ApplicationUser? User { get; set; }
 }

@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useContext } from 'react';
+// eslint-disable-next-line no-unused-vars
+import { AnimatePresence, motion } from 'framer-motion';
+import { AuthContext } from '../contexts/AuthContext';
 import { apiClient } from '../api/apiClient';
 import { GamesList } from './GamesList';
 import { GameForm } from './GameForm';
 import { EditTournamentForm } from './EditTournamentForm';
 
 export function TournamentDetails({ tournament, onTournamentUpdated, onTournamentDeleted }) {
+    const { user, isAdmin } = useContext(AuthContext);
     const [games, setGames] = useState([]);
     const [gamesLoading, setGamesLoading] = useState(false);
     const [showGameForm, setShowGameForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [editingGame, setEditingGame] = useState(null);
+
+    const isOwner = user && (user.id === tournament.userId || isAdmin());
 
     useEffect(() => {
         if (tournament) {
@@ -91,12 +96,16 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
                     <p>{tournament.description}</p>
                 </div>
                 <div className="tournament-actions">
-                    <button className="btn btn-primary" onClick={() => setShowEditForm(true)}>
-                        Redigera
-                    </button>
-                    <button className="btn btn-danger" onClick={handleDeleteTournament}>
-                        Ta bort
-                    </button>
+                    {isOwner && (
+                        <>
+                            <button className="btn btn-primary" onClick={() => setShowEditForm(true)}>
+                                Redigera
+                            </button>
+                            <button className="btn btn-danger" onClick={handleDeleteTournament}>
+                                Ta bort
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -118,18 +127,20 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
             <section className="games-section">
                 <div className="games-header">
                     <h3>Spel i turneringen</h3>
-                    <button
-                        className="btn btn-primary btn-small"
-                        onClick={() => {
-                            setEditingGame(null);
-                            setShowGameForm(!showGameForm);
-                        }}
-                    >
-                        + Lägg till spel
-                    </button>
+                    {isOwner && (
+                        <button
+                            className="btn btn-primary btn-small"
+                            onClick={() => {
+                                setEditingGame(null);
+                                setShowGameForm(!showGameForm);
+                            }}
+                        >
+                            + Lägg till spel
+                        </button>
+                    )}
                 </div>
 
-                {showGameForm && (
+                {showGameForm && isOwner && (
                     <GameForm
                         tournamentId={tournament.id}
                         editingGame={editingGame}
@@ -149,6 +160,7 @@ export function TournamentDetails({ tournament, onTournamentUpdated, onTournamen
                         setShowGameForm(true);
                     }}
                     onDelete={handleDeleteGame}
+                    isOwner={isOwner}
                 />
             </section>
         </motion.div>

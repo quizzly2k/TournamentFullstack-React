@@ -9,7 +9,7 @@ public interface ITournamentService
 {
     Task<IEnumerable<TournamentResponseDTO>> GetAllAsync(string? search = null);
     Task<TournamentResponseDTO?> GetByIdAsync(int id);
-    Task<TournamentResponseDTO> CreateAsync(TournamentCreateDTO dto);
+    Task<TournamentResponseDTO> CreateAsync(TournamentCreateDTO dto, int userId);
     Task<TournamentResponseDTO> UpdateAsync(int id, TournamentUpdateDTO dto);
     Task<bool> DeleteAsync(int id);
 }
@@ -49,14 +49,15 @@ public class TournamentService : ITournamentService
         return tournament != null ? MapToResponseDTO(tournament) : null;
     }
 
-    public async Task<TournamentResponseDTO> CreateAsync(TournamentCreateDTO dto)
+    public async Task<TournamentResponseDTO> CreateAsync(TournamentCreateDTO dto, int userId)
     {
         var tournament = new Tournament
         {
             Title = dto.Title,
             Description = dto.Description,
             MaxPlayers = dto.MaxPlayers,
-            Date = dto.Date
+            Date = dto.Date,
+            UserId = userId
         };
 
         _context.Tournaments.Add(tournament);

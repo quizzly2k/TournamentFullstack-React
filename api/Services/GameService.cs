@@ -9,7 +9,7 @@ public interface IGameService
 {
     Task<IEnumerable<GameResponseDTO>> GetAllAsync(int tournamentId);
     Task<GameResponseDTO?> GetByIdAsync(int id);
-    Task<GameResponseDTO> CreateAsync(GameCreateDTO dto);
+    Task<GameResponseDTO> CreateAsync(GameCreateDTO dto, int userId);
     Task<GameResponseDTO> UpdateAsync(int id, GameUpdateDTO dto);
     Task<bool> DeleteAsync(int id);
 }
@@ -38,7 +38,7 @@ public class GameService : IGameService
         return game != null ? MapToResponseDTO(game) : null;
     }
 
-    public async Task<GameResponseDTO> CreateAsync(GameCreateDTO dto)
+    public async Task<GameResponseDTO> CreateAsync(GameCreateDTO dto, int userId)
     {
         // Verify tournament exists
         var tournament = await _context.Tournaments.FirstOrDefaultAsync(t => t.Id == dto.TournamentId);
@@ -52,6 +52,7 @@ public class GameService : IGameService
             Title = dto.Title,
             Time = dto.Time,
             TournamentId = dto.TournamentId,
+            UserId = userId,
             Tournament = tournament
         };
 

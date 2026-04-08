@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TournamentAPI.DTOs;
 using TournamentAPI.Services;
 
@@ -6,6 +8,7 @@ namespace TournamentAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TournamentsController : ControllerBase
 {
     private readonly ITournamentService _tournamentService;
@@ -22,6 +25,17 @@ public class TournamentsController : ControllerBase
         _logger = logger;
     }
 
+    private int GetUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        return int.TryParse(userIdClaim?.Value, out var userId) ? userId : 0;
+    }
+
+    private bool IsAdmin()
+    {
+        return User.IsInRole("Admin");
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TournamentResponseDTO>>> GetTournaments(
         [FromQuery] string? search = null)
@@ -29,6 +43,14 @@ public class TournamentsController : ControllerBase
         try
         {
             var tournaments = await _tournamentService.GetAllAsync(search);
+
+            // If user is not Admin, only return their own tournaments
+            if (!IsAdmin())
+            {
+                var userId = GetUserId();
+                tournaments = tournaments.Where(t => t.UserId == userId);
+            }
+
             return Ok(tournaments);
         }
         catch (ArgumentException ex)
@@ -45,6 +67,14 @@ public class TournamentsController : ControllerBase
         {
             return NotFound();
         }
+
+        // Check authorization: User can only see own tournaments unless Admin
+        var userId = GetUserId();
+        if (!IsAdmin() && tournament.UserId != userId)
+        {
+            return Forbid("You do not have permission to view this tournament");
+        }
+
         return Ok(tournament);
     }
 
@@ -66,7 +96,8 @@ public class TournamentsController : ControllerBase
 
         try
         {
-            var tournament = await _tournamentService.CreateAsync(createDTO);
+            var userId = GetUserId();
+            var tournament = await _tournamentService.CreateAsync(createDTO, userId);
             return CreatedAtAction(nameof(GetTournament), new { id = tournament.Id }, tournament);
         }
         catch (ArgumentException ex)
@@ -87,8 +118,21 @@ public class TournamentsController : ControllerBase
 
         try
         {
-            var tournament = await _tournamentService.UpdateAsync(id, updateDTO);
-            return Ok(tournament);
+            // Check if tournament exists and user has permission
+            var tournament = await _tournamentService.GetByIdAsync(id);
+            if (tournament == null)
+            {
+                return NotFound();
+            }
+
+            var userId = GetUserId();
+            if (!IsAdmin() && tournament.UserId != userId)
+            {
+                return Forbid("You do not have permission to update this tournament");
+            }
+
+            var updatedTournament = await _tournamentService.UpdateAsync(id, updateDTO);
+            return Ok(updatedTournament);
         }
         catch (KeyNotFoundException)
         {
@@ -101,6 +145,7 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteTournament(int id)
     {
         var success = await _tournamentService.DeleteAsync(id);

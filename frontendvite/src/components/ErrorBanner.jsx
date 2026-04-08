@@ -4,16 +4,6 @@ export function ErrorBanner() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const handleError = (event) => {
-            const customEvent = new CustomEvent('showError');
-            window.addEventListener('showError', (e) => {
-                setError(e.detail);
-                setTimeout(() => {
-                    setError(null);
-                }, 8000);
-            });
-        };
-
         window.showErrorBanner = (message) => {
             setError(message);
             setTimeout(() => {

@@ -6,4 +6,5 @@ public class GameResponseDTO
     public required string Title { get; set; }
     public DateTime Time { get; set; }
     public int TournamentId { get; set; }
+    public int UserId { get; set; }
 }

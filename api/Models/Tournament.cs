@@ -7,7 +7,11 @@ public class Tournament
     public string? Description { get; set; }
     public int MaxPlayers { get; set; }
     public DateTime Date { get; set; }
-    
-    // Navigation property
+
+    // Foreign key for User (Tournament creator)
+    public int UserId { get; set; }
+
+    // Navigation properties
+    public ApplicationUser? User { get; set; }
     public ICollection<Game> Games { get; set; } = new List<Game>();
 }
